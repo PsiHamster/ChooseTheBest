@@ -9,6 +9,7 @@ namespace ChooseTheBest.Model.Game.Game
 	public static class GameStageType
 	{
 		public const string WaitingPlayers = "WaitingPlayers";
+		public const string PackageChoose = "PackageChoose";
 		public const string PackageCreation = "PackageCreation";
 		public const string ReadyToGame = "ReadyToGame";
 		public const string Game = "Game";
