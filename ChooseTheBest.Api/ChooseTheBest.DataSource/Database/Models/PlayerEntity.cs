@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace ChooseTheBest.DataSource.Database.Models
 {
-	public class PlayerEntity
+	public class PlayerEntity : IHasId
 	{
-
+		[BsonRepresentation(BsonType.ObjectId)]
+		public string Id { get; set; }
+		
+		public string Login { get; set; }
+		public string PasswordHash { get; set; }
+		public string PasswordSalt { get; set; }
+		public string DisplayName { get; set; }
+		public string AvatarBase64 { get; set; }
 	}
 }
