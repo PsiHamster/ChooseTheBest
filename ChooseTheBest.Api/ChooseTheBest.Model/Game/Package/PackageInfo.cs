@@ -6,5 +6,6 @@
 		public string PackageName { get; set; }
 		public string PackageDescription { get; set; }
 		public int TitleCount { get; set; }
+		public int LikesCount { get; set; }
 	}
 }

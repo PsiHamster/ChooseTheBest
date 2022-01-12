@@ -26,6 +26,11 @@ namespace ChooseTheBest.Api
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddAuthentication("OAuth")
+				.AddJwtBearer("OAuth", config =>
+				{
+
+				});
 
 			services.AddControllers();
 			services.AddSwaggerGen(c =>
@@ -48,8 +53,15 @@ namespace ChooseTheBest.Api
 
 			app.UseRouting();
 
+			app.UseAuthentication();
 			app.UseAuthorization();
 
+			var webSocketOptions = new WebSocketOptions()
+			{
+				KeepAliveInterval = TimeSpan.FromSeconds(120),
+			};
+
+			app.UseWebSockets(webSocketOptions);
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();

@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChooseTheBest.Model.Transport.User
+namespace ChooseTheBest.DataSource.Database.Managers
 {
-	public class LoginResponse
+
+
+	public class IManager
 	{
 	}
 }
