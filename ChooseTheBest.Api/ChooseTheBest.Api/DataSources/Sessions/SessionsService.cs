@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using ChooseTheBest.Api.DataSources.Sessions.Exceptions;
 using ChooseTheBest.DataSource.Database.Managers;
 using ChooseTheBest.DataSource.Database.Models;
+using ChooseTheBest.Model.Game.Session;
 using MongoDB.Bson.Serialization.Serializers;
 
 namespace ChooseTheBest.Api.DataSources.Sessions
 {
 	public interface ISessionsService
 	{
-		Task<(string token, string refreshToken)> CreateToken(string playerId);
-		Task<bool> ValidateToken(string playerId, string token);
-		Task<string> RefreshToken(string token, string refreshToken);
+		Task<Session> CreateToken(string playerId);
+		Task<Session> ValidateToken(string token);
+		Task<Session> RefreshToken(string token, string refreshToken);
 	}
 
 	public class SessionsService : ISessionsService
@@ -23,7 +25,7 @@ namespace ChooseTheBest.Api.DataSources.Sessions
 			_sessionManager = sessionManager ?? throw new ArgumentNullException(nameof(sessionManager));
 		}
 
-		public async Task<(string token, string refreshToken)> CreateToken(string playerId)
+		public async Task<Session> CreateToken(string playerId)
 		{
 			var session = new SessionEntity()
 			{
@@ -36,34 +38,58 @@ namespace ChooseTheBest.Api.DataSources.Sessions
 
 			await _sessionManager.Create(session);
 
-			return (session.Token, session.RefreshToken);
+			return new Session()
+			{
+				PlayerId = playerId,
+				RefreshToken = session.RefreshToken,
+				Token = session.Token,
+			};
 		}
-
-		public async Task<bool> ValidateToken(string playerId, string token)
+		
+		public async Task<Session> ValidateToken(string token)
 		{
 			var tokenEntity = await _sessionManager.FindToken(token);
+			ValidateTokenEntity(tokenEntity);
 
-			return tokenEntity.Expiration > DateTimeOffset.Now;
+			return new Session()
+			{
+				PlayerId = tokenEntity.PlayerId,
+				RefreshToken = tokenEntity.RefreshToken,
+				Token = tokenEntity.Token,
+			};
 		}
 
-		public async Task<string> RefreshToken(string token, string refreshToken)
+		public async Task<Session> RefreshToken(string token, string refreshToken)
 		{
 			var tokenEntity = await _sessionManager.FindToken(token);
-			if (tokenEntity == null)
-				throw new TokenNotFoundException();
+			ValidateTokenEntity(tokenEntity);
 
 			tokenEntity.RefreshToken = Guid.NewGuid().ToString();
 			tokenEntity.Expiration = DateTimeOffset.Now.Add(DefaultExpirationPeriod);
 
 			await _sessionManager.Update(tokenEntity);
 
-			return tokenEntity.RefreshToken;
+			return new Session()
+			{
+				PlayerId = tokenEntity.PlayerId,
+				RefreshToken = tokenEntity.RefreshToken,
+				Token = tokenEntity.Token,
+			};
+		}
+
+		private static void ValidateTokenEntity(SessionEntity? tokenEntity)
+		{
+			if (tokenEntity == null)
+			{
+				throw new TokenNotFoundException();
+			}
+
+			if (tokenEntity.Expiration > DateTimeOffset.Now)
+			{
+				throw new TokenExpiredException();
+			}
 		}
 
 		private readonly ISessionManager _sessionManager;
-	}
-
-	public class TokenNotFoundException : Exception
-	{
 	}
 }
