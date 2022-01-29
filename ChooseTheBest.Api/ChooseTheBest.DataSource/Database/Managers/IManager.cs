@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ChooseTheBest.DataSource.Database.Models;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace ChooseTheBest.DataSource.Database.Managers

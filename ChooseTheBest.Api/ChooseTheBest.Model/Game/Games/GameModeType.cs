@@ -1,4 +1,4 @@
-﻿namespace ChooseTheBest.Model.Game.Game
+﻿namespace ChooseTheBest.Model.Game.Games
 {
 	public static class GameModeType
 	{

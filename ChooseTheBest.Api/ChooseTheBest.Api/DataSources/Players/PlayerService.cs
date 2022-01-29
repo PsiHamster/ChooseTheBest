@@ -15,6 +15,7 @@ namespace ChooseTheBest.Api.DataSources.Players
 	public interface IPlayerService
 	{
 		Task<PlayerInfo> CreatePlayer();
+		Task UpdatePlayerInfo(PlayerInfo playerInfo);
 		Task<PlayerInfo> GetPlayer(string id);
 		Task<PlayerInfo[]> GetPlayers(string[] ids);
 
@@ -40,7 +41,18 @@ namespace ChooseTheBest.Api.DataSources.Players
 			return new PlayerInfo()
 			{
 				PlayerId = playerEntity.Id,
+				PlayerName = "Player",
 			};
+		}
+
+		public async Task UpdatePlayerInfo(PlayerInfo playerInfo)
+		{
+			var player = await _playerManager.FindById(playerInfo.PlayerId);
+
+			player!.AvatarBase64 = playerInfo.PlayerAvatarBase64;
+			player!.DisplayName = playerInfo.PlayerName;
+
+			await _playerManager.Update(player);
 		}
 
 		public async Task<PlayerInfo> GetPlayer(string id)

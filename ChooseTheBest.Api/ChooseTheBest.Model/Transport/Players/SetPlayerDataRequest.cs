@@ -2,7 +2,7 @@
 {
 	public class SetPlayerDataRequest
 	{
-		public string Name { get; set; }
-		public string AvatarBase64Data { get; set; }
+		public string PlayerName { get; set; }
+		public string Base64Avatar { get; set; }
 	}
 }
